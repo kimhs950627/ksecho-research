@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>심초음파 영상 AI로 논문 쓰기 — 2026년의 빈 자리와 6개월 계획</title>
+<meta name="description" content="한국심초음파학회(KSEcho) 투고를 목표로, 공개 심초음파 데이터의 실제 구조와 영상 AI의 빈 영역, 도플러 기반 E/e′ 자동화 설계를 서술형으로 정리한 보고서.">
+<meta property="og:title" content="심초음파 영상 AI로 논문 쓰기">
+<meta property="og:description" content="2026년의 빈 자리와 6개월 계획 — 공개 데이터, 도플러, 그리고 KSEcho">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230E7490'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --c-bg: #F6F9FA;
+    --c-surface: #FFFFFF;
+    --c-line: #DCE6EA;
+    --c-line-strong: #B7C6CC;
+    --c-ink: #0F171C;
+    --c-ink-2: #3B4A51;
+    --c-ink-3: #5D6468;
+    --c-accent: #0E7490;
+    --c-accent-soft: #E4F0F4;
+    --c-quote: #EAF2F5;
+    --pad-x: clamp(28px, 5vw, 96px);
+    --maxw: 860px;
+    --measure: 100%;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.82;
+    word-break: keep-all;
+    line-break: strict;
+    overflow-wrap: break-word;
+    hyphens: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+    padding-top: clamp(40px, 6vw, 88px);
+    padding-bottom: clamp(48px, 7vw, 104px);
+  }
+  .back {
+    display: inline-block;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .75rem;
+    letter-spacing: .08em;
+    text-decoration: none;
+    color: var(--c-ink-3);
+    border-bottom: 1px solid var(--c-line-strong);
+    margin-bottom: 34px;
+  }
+  .back:hover { color: var(--c-accent); }
+  .eyebrow {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--c-accent);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -.032em;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    max-width: 22ch;
+  }
+  .sub {
+    font-size: 1.125rem;
+    color: var(--c-ink-2);
+    max-width: 46ch;
+    margin: 0 0 24px;
+    line-height: 1.7;
+  }
+  .byline {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .75rem;
+    color: var(--c-ink-3);
+    letter-spacing: .04em;
+    padding-top: 14px;
+    border-top: 1px solid var(--c-line-strong);
+  }
+  article { max-width: var(--measure); margin-top: 44px; }
+  h2 {
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -.022em;
+    line-height: 1.4;
+    margin: 64px 0 18px;
+    padding-top: 22px;
+    border-top: 1px solid var(--c-line);
+  }
+  h2 .no {
+    display: block;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    font-weight: 400;
+    letter-spacing: .16em;
+    color: var(--c-accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  h3 {
+    font-size: 1.0625rem;
+    font-weight: 800;
+    letter-spacing: -.015em;
+    margin: 34px 0 10px;
+  }
+  p { margin: 0 0 1.15em; color: var(--c-ink-2); }
+  p strong { color: var(--c-ink); font-weight: 700; }
+  a { color: var(--c-accent); }
+  ul, ol { margin: 0 0 1.3em; padding-left: 1.2em; color: var(--c-ink-2); }
+  li { margin-bottom: .55em; }
+  li::marker { color: var(--c-accent); }
+
+  .lede { font-size: 1.125rem; color: var(--c-ink); line-height: 1.78; }
+  .lead-in::first-letter { }
+
+  blockquote {
+    margin: 30px 0;
+    padding: 20px 24px;
+    background: var(--c-quote);
+    border-left: 3px solid var(--c-accent);
+    color: var(--c-ink);
+  }
+  blockquote p { margin: 0; color: var(--c-ink); font-size: 1.0625rem; }
+  blockquote p + p { margin-top: .8em; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .9375rem; margin: 22px 0 26px; }
+  caption {
+    text-align: left;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+    padding-bottom: 8px;
+  }
+  th, td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: .75rem; font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--c-ink-3); font-weight: 600; border-bottom-color: var(--c-line-strong); }
+  td:first-child { color: var(--c-ink); font-weight: 600; }
+  td { color: var(--c-ink-2); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .note {
+    font-size: .875rem;
+    color: var(--c-ink-3);
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    padding: 16px 18px;
+    margin: 26px 0;
+  }
+  .note b { color: var(--c-ink); }
+  .note p { margin: 0; font-size: .875rem; }
+  .note p + p { margin-top: .7em; }
+
+  .toc {
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    padding: 20px 24px 22px;
+    margin: 36px 0 8px;
+    max-width: var(--measure);
+  }
+  .toc p {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+    margin: 0 0 10px;
+  }
+  .toc ol { margin: 0; padding-left: 1.1em; font-size: .9375rem; line-height: 1.9; }
+  .toc a { color: var(--c-ink-2); text-decoration: none; }
+  .toc a:hover { color: var(--c-accent); }
+
+  .sources { max-width: var(--measure); margin-top: 68px; padding-top: 24px; border-top: 2px solid var(--c-line-strong); }
+  .sources h2 { border: 0; margin-top: 0; padding-top: 0; font-size: 1.125rem; }
+  .sources ol { font-size: .875rem; line-height: 1.75; padding-left: 1.3em; }
+  .sources li { margin-bottom: .6em; }
+  .sources a { word-break: break-all; }
+
+  footer p { margin: 0; }
+  footer {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+    padding-bottom: 64px;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .75rem;
+    color: var(--c-ink-3);
+    line-height: 1.75;
+  }
+  :focus-visible { outline: 3px solid var(--c-accent); outline-offset: 3px; }
+
+  @media print {
+    @page { size: A4; margin: 18mm 16mm; }
+    body { font-size: 10.5pt; line-height: 1.7; background: #fff; }
+    .back, .toc { display: none; }
+    h2 { break-after: avoid; }
+    table, .note, blockquote { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">&larr; 자료 모음</a>
+  <p class="eyebrow">보고서 · 2026-10-23</p>
+  <h1>심초음파 영상 AI로 논문 쓰기</h1>
+  <p class="sub">2026년에 무엇이 비어 있고, 6개월 안에 무엇을 할 수 있는가</p>
+  <p class="byline">가정의학과 · 검진센터 · KSEcho / JCVI 투고 준비</p>
+
+  <div class="toc">
+    <p>목차</p>
+    <ol>
+      <li><a href="#s1">요약</a></li>
+      <li><a href="#s2">심초음파 AI는 어디까지 왔는가</a></li>
+      <li><a href="#s3">비어 있는 곳은 도플러다</a></li>
+      <li><a href="#s4">데이터 접근이라는 현실 문제</a></li>
+      <li><a href="#s5">세 개의 트랙, 그리고 왜 도플러인가</a></li>
+      <li><a href="#s6">도플러 E/e′ 실험설계</a></li>
+      <li><a href="#s7">KSEcho와 JCVI라는 출구</a></li>
+      <li><a href="#s8">24주 계획</a></li>
+      <li><a href="#s9">확인하지 못한 것과 한계</a></li>
+      <li><a href="#s10">맺음</a></li>
+    </ol>
+  </div>
+
+  <article>
+    <h2 id="s1"><span class="no">01</span>요약</h2>
+
+    <p class="lede">심초음파 영상에 인공지능을 붙이는 연구는 2026년 현재 두 갈래로 갈라져 있다. 하나는 이미 포화된 좌심실 박출률(LVEF) 예측이고, 다른 하나는 아직 거의 비어 있는 도플러 파형 해석이다. 이 보고서의 결론은 단순하다. <strong>박출률로 승부하지 말고 도플러로 가라.</strong></p>
+
+    <p>이유는 세 가지다. 첫째, 공개 심초음파 영상 데이터는 사실상 모두 심첨 4방 단면(B-mode)으로 구성되어 있고, 승모판 유입 파형이나 조직 도플러 같은 스펙트럼 영상은 거의 포함하지 않는다. 둘째, 그런데 임상에서 이완기능장애를 판단하고 충만압을 추정할 때 실제로 보는 값은 E/e′, 삼첨판 역류 최고속도, 좌심방 용적 같은 도플러 유래 지표다. 셋째, 도플러는 파형의 경계를 찾아야 하는 문제라 B-mode의 심내막 추적보다 다루기 어렵고, 그만큼 선행연구가 얇다. 어렵고 비어 있는 곳은 한 사람이 기여할 수 있는 곳이기도 하다.</p>
+
+    <p>라벨 문제는 예상과 다르게 이미 해결되어 있다. PhysioNet의 MIMIC-IV-ECHO는 카디올로지스트가 기록한 구조화 측정값을 206,488건의 검사에 대해 제공하며, 이는 MIMIC-IV 임상 데이터베이스와 환자 단위로 연결되어 사망과 재입원까지 추적할 수 있다. 즉 영상에 라벨을 사람이 붙이지 않고도 학습할 수 있는 조건이 마련되어 있다. 남은 병목은 영상 쪽, 정확히는 "도플러 클립을 찾아내는 일"이다.</p>
+
+    <h2 id="s2"><span class="no">02</span>심초음파 AI는 어디까지 왔는가</h2>
+
+    <p>2020년 스탠퍼드 그룹이 EchoNet-Dynamic을 공개하면서 심초음파 영상 AI의 기준선이 정해졌다. 1만 건이 넘는 심첨 4방 영상과 박출률·용적 라벨을 함께 내놓았고, 이후 박출률 회귀는 이 데이터셋 위에서 표준 벤치마크가 되었다. 문제는 그 표준이 너무 성공적이었다는 점이다. 2021년부터 지금까지 같은 데이터, 같은 과제, 조금 다른 구조의 논문이 계속 나왔고, 이제 "EchoNet-Dynamic에서 박출률을 얼마나 잘 맞히는가"는 연구 질문이라기보다 성능 튜닝 경쟁에 가깝다.</p>
+
+    <p>2024년에서 2026년 사이에 일어난 변화가 이 경쟁의 의미를 더 흐리게 만들었다. 영상 파운데이션 모델이 등장하면서, 수만 장의 라벨로 처음부터 학습하는 접근의 가치가 빠르게 떨어졌다. 소량의 라벨로 미세조정하는 편이 더 나은 성능을 내는 사례가 늘었고, 소아 심초음파 영역에서도 같은 흐름이 확인된다. 개인이 단일 GPU로 모델을 처음부터 학습시켜 학회지 수준의 신규성을 주장하기는 어려워진 것이다.</p>
+
+    <p>그래서 심사자가 지금 묻는 것은 정확도가 아니다. <strong>다른 병원, 다른 장비, 다른 인구에서도 같은 성능이 나오는가. 그리고 그 성능이 환자의 치료를 실제로 바꾸는가.</strong> 이 두 질문에 답하지 못하는 AI 논문은 방법이 아무리 정교해도 게재가 어렵다. 역설적으로, 이 변화는 임상의에게 유리하다. 모델을 잘 만드는 사람보다, 무엇이 임상적으로 의미 있는지 아는 사람이 답할 수 있는 질문이 되었기 때문이다.</p>
+
+    <h2 id="s3"><span class="no">03</span>비어 있는 곳은 도플러다</h2>
+
+    <p>공개된 심초음파 영상 데이터를 나열해 보면 구성이 놀랄 만큼 비슷하다. EchoNet-Dynamic은 심첨 4방, CAMUS는 2방·3방·4방, EchoNet-Pediatric은 소아 심첨 4방이다. 모두 B-mode 단면이다. 승모판 유입 파형, 조직 도플러, 연속파 도플러로 얻는 삼첨판 역류 파형 같은 스펙트럼 영상은 이 데이터셋들에 사실상 들어 있지 않다.</p>
+
+    <p>그런데 외래에서 이완기능을 판단하는 장면을 떠올려 보면 정반대다. 좌심실 이완기능 평가는 2016년 미국심초음파학회와 유럽심혈관영상학회의 권고에 따라 승모판 유입 파형의 E파와 A파, 조직 도플러의 e′, 삼첨판 역류 최고속도, 좌심방 용적지수를 조합해 판정한다. E/e′가 상승해 있으면 충만압이 높다고 읽고, 그 판단이 이뇨제 사용과 추적 간격을 바꾼다. 즉 <strong>임상적 결정이 갈리는 지점은 B-mode가 아니라 도플러에 있다.</strong></p>
+
+    <p>왜 비어 있는가. 도플러 영상은 B-mode와 성질이 다르다. 파형은 시간축을 가로지르는 곡선이고, 그 곡선의 시작과 끝, 피크의 위치를 찾아야 값이 나온다. 심내막을 따라가는 문제보다 라벨을 만들기가 번거롭고, 앨리어싱이나 불완전한 파형처럼 자동화를 방해하는 조건도 많다. 어려운 문제는 연구자가 덜 몰린다. 그리고 덜 몰린 곳에 기여할 여지가 남는다.</p>
+
+    <blockquote>
+      <p>박출률은 이미 잘 맞힌다. 잘 맞히는 값을 또 맞히는 논문은 심사에서 "그래서 무엇이 새로운가"를 통과하지 못한다. 반면 잘 못 맞히는 값을 처음 맞히면, 성능이 조금 낮아도 논문이 된다.</p>
+    </blockquote>
+
+    <h2 id="s4"><span class="no">04</span>데이터 접근이라는 현실 문제</h2>
+
+    <p>여기서 실무적인 벽이 하나 있다. MIMIC-IV-ECHO는 전체가 수 테라바이트 규모이고, 개인이 전부 내려받는 것은 현실적이지 않다. 그러나 이 벽은 생각보다 낮다. 데이터의 구성이 다운로드 난이도와 분석 가치가 일치하지 않기 때문이다.</p>
+
+    <table>
+      <caption>MIMIC-IV-ECHO v1.0.1 구성</caption>
+      <thead><tr><th>구성</th><th>규모</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td>구조화 측정값</td><td class="num">206,488 검사 · 91,372명 · 2008–2022</td><td>라벨. 검사당 180–230개 항목</td></tr>
+        <tr><td>DICOM 영상</td><td class="num">524,137 파일 · 7,228 검사 · 4,572명</td><td>모델 입력. 환자 단위 선택 다운로드</td></tr>
+        <tr><td>요약 테이블</td><td>record-list · study-list</td><td>영상–측정값 ±2일 시간 연결</td></tr>
+        <tr><td>임상 데이터</td><td>MIMIC-IV 전체</td><td>사망·입원·동반질환</td></tr>
+      </tbody>
+    </table>
+
+    <p>용량의 대부분은 DICOM이고, 정작 분석에 쓰는 숫자는 <code>structured_measurement.csv</code> 한 파일에 있다. 이 파일은 long format으로, 한 행이 한 측정값이다. 검사 하나에 200행 안팎이 붙으므로 전체는 4천만 행 규모가 되지만, 필요한 항목만 걸러내면 결과는 수십만 행으로 줄어든다. PhysioNet은 요약 테이블을 BigQuery로도 제공한다고 안내하므로, 계정만 있으면 내려받지 않고 질의하는 경로도 열려 있다. 다만 데이터셋 이름과 접근 범위는 로그인 후 직접 확인해야 한다.</p>
+
+    <h3>이 데이터셋의 진짜 함정</h3>
+
+    <p>결측이 아니다. 공식 문서가 명시하는 더 곤란한 문제가 있다. 연구 기간 중 심초음파 랩 시스템이 교체되면서 같은 개념의 변수명이 달라졌다. 한 시스템은 <code>lvef</code>와 <code>lvef_upper</code>로, 다른 시스템은 <code>biplane_lvef</code>와 <code>lvef_3d</code>로 기록했다. 문서는 <strong>"변수의 부재가 임상적 결측이 아니라 소스 시스템의 차이일 수 있다"</strong>고 명시한다.</p>
+
+    <p>이 문장을 놓치면 분석이 조용히 틀어진다. "E/e′는 30%에서만 기록되었다"는 서술이, 실은 "구 시스템에는 그 변수 자체가 없었다"는 뜻일 수 있기 때문이다. 시대를 구분하는 변수를 만들고, 시대별 변수 가용성 교차표를 먼저 출력하고, 주 분석은 양쪽 시대에 모두 존재하는 항목으로 한정해야 한다. 이 교차표 자체를 보충자료로 넣으면 심사에서 신뢰를 얻는다.</p>
+
+    <p>뷰 주석에도 비슷한 함정이 있다. PhysioNet에는 MIMIC-IV-ECHO의 뷰 분류를 붙인 ECHOVIEW 데이터가 있고, 29,196검사에 23개 뷰 클래스가 달려 있다. 규모는 충분하지만 이 라벨은 사람이 아니라 분류기가 만든 것이다. 사람 검증은 50검사 표본에 그쳤다. 이 라벨로 학습하고 같은 라벨로 평가하면 자기 확인에 빠진다. 사람이 직접 판독한 평가 전용 세트가 별도로 필요하다.</p>
+
+    <h2 id="s5"><span class="no">05</span>세 개의 트랙, 그리고 왜 도플러인가</h2>
+
+    <p>같은 데이터로 서로 다른 세 가지 연구가 가능하다. 난이도가 아니라 "무엇을 증명하는가"로 갈린다.</p>
+
+    <table>
+      <caption>트랙 비교</caption>
+      <thead><tr><th>트랙</th><th>증명하는 것</th><th>기간</th><th>실패 시</th></tr></thead>
+      <tbody>
+        <tr><td>A. 뷰·적합도 트리아지</td><td>검진 검사 중 판독이 필요한 건을 자동 선별</td><td>8–10주</td><td>학회 초록으로 축소</td></tr>
+        <tr><td>B. 도플러 E/e′ 자동화</td><td>도플러에서 이완기 지표를 재현</td><td>5–6개월</td><td>방법론 논문으로 축소</td></tr>
+        <tr><td>C. 교차 데이터 일반화</td><td>다른 인구·장비에서 성능 유지</td><td>3–4개월</td><td>부록 분석으로 흡수</td></tr>
+      </tbody>
+    </table>
+
+    <p>A는 가장 빠르고 리스크가 작다. 검진센터에서 실제로 병목이 되는 지점—정상 검사가 대부분인데 전문의가 전부 읽어야 하는 구조—을 정면으로 건드린다. 다만 학술적 신규성은 낮고, 뷰 분류는 이미 잘 되는 과제라 "왜 이걸 다시 하는가"라는 질문을 피하기 어렵다.</p>
+
+    <p>C는 학습을 거의 하지 않는다는 점에서 매력적이다. 자기가 만든 작은 모델을 한 데이터로 학습하고 다른 데이터로 시험하는 것만으로 일반화라는 질문에 답할 수 있다. B가 지연될 때의 안전판으로도 기능한다.</p>
+
+    <p>그럼에도 본선은 B다. 이유는 세 가지다. 첫째, 이완기능은 한국심초음파학회의 본령이라 주제 적합성을 설명할 필요가 없다. 둘째, 공개 영상에 도플러가 없어 선행연구가 얇고, 따라서 성능이 다소 낮아도 기여가 인정된다. 셋째, E와 e′를 자동으로 뽑는 파이프라인이 한 번 서면 삼첨판 역류 속도, 판막 파형으로 같은 구조를 재사용할 수 있어 확장 비용이 낮다.</p>
+
+    <h2 id="s6"><span class="no">06</span>도플러 E/e′ 실험설계</h2>
+
+    <h3>설계의 갈림길: 직접 회귀인가, 구성요소인가</h3>
+
+    <p>E/e′를 영상에서 직접 회귀하는 방법이 가장 단순하다. 클립을 넣으면 숫자 하나가 나온다. 구현이 쉽고 지표가 하나라 보고도 간단하다. 그러나 오류가 났을 때 어디서 났는지 알 수 없고, 새 병원에서 성능이 떨어졌을 때 이유를 설명할 수 없다. 심사에서 "왜 틀렸는가"에 답하지 못하는 모델은 재현성 논의에서 불리하다.</p>
+
+    <p>이 보고서는 구성요소 경로를 택한다. 승모판 유입 파형에서 E를, 조직 도플러 파형에서 e′를 각각 예측하고, E/e′는 두 예측값의 비로 계산한다. 별도 모델을 두지 않는다. 이 선택의 이득은 성능이 아니라 설명가능성이다. 중간값을 사람 측정과 직접 비교할 수 있고, 한쪽 파형이 판독 불가여도 나머지 절반의 결과가 남는다. 두 파형은 서로 다른 클립이고 스케일도 달라 전처리를 분리해야 한다는 점은 비용이지만, 그 비용이 곧 논문의 절반이 된다.</p>
+
+    <h3>데이터는 3층으로 나눈다</h3>
+
+    <p>학습은 MIMIC-IV-ECHO로 한다. 내부검증은 같은 데이터의 환자 단위 분할로, 외부검증은 자체 검진 코호트로 한다. 여기에 네 번째 층이 하나 더 필요하다. <strong>사람이 직접 판독한 300클립</strong>이다. 기계 생성 라벨로만 평가하면 성능이 부풀려지고, 그 사실이 리뷰에서 드러나면 논문 전체의 신뢰가 무너진다. 이 300개는 예산과 시간을 미리 배정해야 하는 항목이다.</p>
+
+    <h3>코호트는 네 번 걸러진다</h3>
+
+    <p>전체 경흉부 검사에서 시작해, 도플러 클립이 있는 검사만 남기고, E와 e′ 라벨이 기록된 검사만 남기고, 마지막으로 환자당 지수검사 한 건만 남긴다. 마지막 단계를 빠뜨리면 같은 환자의 다른 검사가 학습과 검증에 동시에 들어가 성능이 부풀려진다. 실제 배포에서는 새 환자를 만나므로, 이 누수는 임상 성능을 낙관적으로 왜곡한다.</p>
+
+    <h3>라벨 정제가 성능의 절반이다</h3>
+
+    <p>구조화 측정값은 사람이 임상 목적으로 기록한 값이라 노이즈가 있다. 부등호나 문자가 섞인 행을 먼저 세고, 숫자로 바꿀 수 없는 행은 버리되 버린 수를 보고한다. 같은 항목에 단위가 섞이는 경우가 있으므로 단위별 분포를 확인한다. 시대 구분은 앞서 말한 대로 층화한다. 측정자 간 변이는 한계로 명시하고, 라벨 품질을 세 등급으로 나눠 민감도 분석을 돌린다.</p>
+
+    <h3>평가는 3층</h3>
+
+    <table>
+      <caption>평가 지표와 판정 기준</caption>
+      <thead><tr><th>층</th><th>지표</th><th>기준</th><th>역할</th></tr></thead>
+      <tbody>
+        <tr><td>일치도</td><td>ICC, Bland–Altman</td><td>ICC ≥ 0.75</td><td>1차</td></tr>
+        <tr><td>진단</td><td>E/e′ 상승 AUC</td><td>AUC ≥ 0.80</td><td>1차</td></tr>
+        <tr><td>재분류</td><td>NRI, 교정 기울기</td><td>교정 0.8–1.2</td><td>2차</td></tr>
+        <tr><td>임상</td><td>사망 예측 증분</td><td>C-index 증가</td><td>탐색</td></tr>
+      </tbody>
+    </table>
+
+    <p>정확도 하나로 승부하지 않는 이유는 분명하다. 상관계수와 평균절대오차는 이미 포화된 지표이고, 심사자가 원하는 것은 임상적 결과다. 사람 측정과의 일치도를 보이고, 임상 컷오프 기준으로 재분류가 얼마나 개선되는지 보이고, 그 다음에 예후 예측력의 증분을 보는 순서가 자연스럽다. 판정 기준은 분석 전에 등록해 사후 조정 논란을 막는다.</p>
+
+    <h3>표본수는 지금 정하지 않는다</h3>
+
+    <p>프로토콜에서 가장 흔한 감점이 근거 없는 표본수다. 일치도는 허용 가능한 일치한계 폭과 예상 표준편차로, 진단 정확도는 목표 AUC와 비교 기준, 검정력으로, 임상 결과는 사건 수로 계산한다. 이 네 입력값을 먼저 고정하고, 계산은 스크립트로 수행해 결과를 부록에 붙인다. 지금 숫자를 지어내는 것보다 이렇게 비워 두는 편이 정직하고, 실제로 심사에서 유리하다.</p>
+
+    <h3>킬 스위치를 미리 건다</h3>
+
+    <p>일정이 지켜지는 연구는 실패를 미리 정의한 연구다. 이 설계에는 네 개의 중단 조건이 붙는다. 도플러 클립이 전체의 20% 미만이면 B를 접고 A로 간다. E·e′ 라벨 보유 검사가 5천 건 미만이면 E 단일 지표로 축소한다. 뷰 게이트의 사람 라벨 평가가 목표에 못 미치면 3단계에 착수하지 않는다. 최종 일치도가 0.70 미만이면 "AI와 사람의 불일치 분석"이라는 별도 논문으로 전환한다—그것도 논문이다. 판정은 8주와 16주 리뷰에서만 하고, 중간에 흔들지 않는다.</p>
+
+    <h2 id="s7"><span class="no">07</span>KSEcho와 JCVI라는 출구</h2>
+
+    <p>한국심초음파학회의 공식 학술지는 <em>Journal of Cardiovascular Imaging</em>이며, 2024년부터 Springer Nature에서 유통된다. PubMed와 Scopus에 색인되고 있으며, 게재 유형에 원저뿐 아니라 리뷰, 에디토리얼, 이미지, 그리고 이의 제기(matters arising)가 포함된다. 범위 역시 임상·기술·실험·중개 연구를 명시적으로 포함하므로, 기술 논문이라고 해서 범위 밖으로 밀릴 이유는 없다.</p>
+
+    <p>일정은 현실적으로 봐야 한다. 2026년 추계학술대회 초록 접수는 8월 1일부터 9월 28일까지였고 이미 마감되었다. 다음 창구는 2027년 춘계 학술대회이며, 통상 상반기에 열리지만 정확한 날짜와 초록 마감은 학회 공지로 확인해야 한다. 이 보고서는 그 시점을 목표로 3개월에 초록, 6개월에 원고라는 이중 일정을 제안한다. 논문이 늦어져도 학회 발표 이력은 남기 때문이다.</p>
+
+    <p>마지막으로 서사의 문제가 남는다. 가정의학과 소속이 심초음파 영상 AI를 한다고 하면, 학회 안에서 "왜"라는 질문을 받는다. 이 질문에 대한 가장 좋은 답은 성능이 아니라 일반화다. 미국 단일기관 데이터로 만든 모델이 한국 검진 인구에서도 같은 값을 내는지 확인하는 일은, 검진센터에서 일하는 사람이 아니면 하기 어렵다. 약점이 강점으로 뒤집히는 지점이 정확히 여기다.</p>
+
+    <h2 id="s8"><span class="no">08</span>24주 계획</h2>
+
+    <p>1–4주는 클립 존재 확인과 라벨 인벤토리다. 무작위 50명을 골라 DICOM 메타데이터를 훑고, 유입 도플러·조직 도플러·삼첨판 역류 클립이 각각 몇 퍼센트인지 센다. 이 숫자가 20%를 넘지 못하면 이후 계획은 무효이므로, 가장 먼저 확인해야 하는 항목이다.</p>
+
+    <p>5–8주는 1단계 뷰 게이트와 사람 라벨 300클립이다. 8주차에 1차 판정을 한다. 여기서 목표에 미달하면 2단계로 넘어가지 않는다.</p>
+
+    <p>9–16주는 파형 분할이다. 규칙 기반으로 후보 경계를 잡고 사람이 고치는 반자동 방식으로 라벨을 만든다. 사람이 고친 비율을 기록하는데, 이 숫자가 곧 자동화 가능성의 증거가 된다. 경계가 불명확한 클립은 버리지 않고 판독불가 클래스로 남긴다. 앨리어싱과 불완전 파형도 별도 클래스로 학습시켜야 실제 환경에서 조용히 틀린 값을 내지 않는다.</p>
+
+    <p>17–20주는 E와 e′ 산출과 일치도 평가다. 신뢰구간을 함께 출력한다. 불확실성을 함께 내는 순간 이 도구는 의사결정 지원 도구가 되고, 논문의 성격이 달라진다.</p>
+
+    <p>21–24주는 외부검증과 투고다. 자체 검진 코호트에서 소량을 판독해 교차 검증하고, 원고 두 편(1단계, 3단계)을 정리한다. 코드는 공개하되 데이터는 재배포하지 않는다.</p>
+
+    <h2 id="s9"><span class="no">09</span>확인하지 못한 것과 한계</h2>
+
+    <p>이 보고서에서 확정하지 못한 것이 몇 가지 있다. 첫째, MIMIC DICOM 하위집합에 도플러 클립이 실제로 얼마나 들어 있는지다. 이 데이터는 중환자·입원 환자 중심으로 수집되어 있어, 외래 검진처럼 도플러를 일상적으로 찍는 환경과 구성이 다를 수 있다. 이 숫자가 계획 전체의 생사를 가른다.</p>
+
+    <p>둘째, 구조화 측정값에 E/e′가 어떤 변수명으로, 어느 정도 기록률로 존재하는지다. credentialed access 이후에만 확인할 수 있어, 이 보고서의 변수 서술은 표준 측정 항목에 근거한 추정이다.</p>
+
+    <p>셋째, 표본수와 검정력은 입력값 없이 계산하지 않았다. 의도된 공백이며, 프로토콜 단계에서 채워야 한다.</p>
+
+    <p>넷째, 학습 환경을 가정하지 않았다. 24주 일정은 1인 수행, 단일 GPU를 전제로 한 추정이다. 영상 파운데이션 모델을 미세조정하는 방식으로 바꾸면 컴퓨팅 요구가 달라진다.</p>
+
+    <p>다섯째, 이 보고서는 임상적 판단의 근거가 아니다. 연구 계획 문서이며, 어떤 수치도 환자 진료에 직접 적용될 수 없다.</p>
+
+    <h2 id="s10"><span class="no">10</span>맺음</h2>
+
+    <p>정리하면 이렇다. 심초음파 영상 AI에서 박출률은 이미 해결된 문제이고, 도플러는 아직 아니다. 도플러의 라벨은 공개 데이터에 숫자로 쌓여 있고, 영상은 선택적으로 내려받을 수 있으며, 평가 기준은 정확도가 아니라 일치도와 재분류로 옮겨야 한다. 이 네 문장이 6개월 계획의 전부다.</p>
+
+    <p>가장 먼저 할 일은 논문을 쓰는 것이 아니라 클립을 세는 것이다. 50명을 무작위로 골라 도플러 클립이 몇 퍼센트인지 확인하는 30분이, 24주 계획의 생사를 결정한다. 그 숫자가 나오면 나머지는 공학의 문제이고, 공학의 문제는 대개 시간의 문제다.</p>
+  </article>
+
+  <div class="sources">
+    <h2>출처</h2>
+    <ol>
+      <li>Gow B, Pollard T, Greenbaum N, et al. MIMIC-IV-ECHO: Echocardiogram Matched Subset v1.0.1. PhysioNet. 2026. <a href="https://physionet.org/content/mimic-iv-echo/">physionet.org/content/mimic-iv-echo/</a></li>
+      <li>Ouyang D, He B, Ghorbani A, et al. Video-based AI for beat-to-beat assessment of cardiac function. <em>Nature</em> 2020;580:252–256.</li>
+      <li>EchoNet-Dynamic. Stanford AIMI. <a href="https://echonet.github.io/dynamic/">echonet.github.io/dynamic/</a></li>
+      <li>ECHOVIEW: Structured Viewing Classification Annotations From the MIMIC-IV-ECHO Dataset. PhysioNet. <a href="https://physionet.org/content/echoview/">physionet.org/content/echoview/</a></li>
+      <li>CAMUS dataset. CREATIS. <a href="https://www.creatis.insa-lyon.fr/Challenge/camus/">creatis.insa-lyon.fr/Challenge/camus/</a></li>
+      <li>Nagueh SF, Smiseth OA, Appleton CP, et al. Recommendations for the Evaluation of Left Ventricular Diastolic Function by Echocardiography: An Update from the ASE and EACVI. <em>J Am Soc Echocardiogr</em> 2016;29:277–314.</li>
+      <li>Journal of Cardiovascular Imaging — Aims and Scope. <a href="https://e-jcvi.org/">e-jcvi.org</a></li>
+      <li>한국심초음파학회 추계학술대회 초록접수 안내 (2026). <a href="https://www.ksecho.org/">ksecho.org</a></li>
+      <li>Collins GS, Moons KGM, Dhiman P, et al. TRIPOD+AI statement. <em>BMJ</em> 2024;385:e078378.</li>
+    </ol>
+  </div>
+</div>
+
+<footer>
+  <p>환자 정보 없음 — 모든 수치는 공개 데이터셋 기술 문서와 학회 공지에 근거한다.<br>
+  확인하지 못한 값은 본문에 명시했다. 이 문서는 연구 계획이며 임상 판단의 근거가 아니다.</p>
+</footer>
+</body>
+</html>

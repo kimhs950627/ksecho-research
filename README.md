@@ -12,6 +12,7 @@
 |---|---|---|
 | [ai-tracks.html](ai-tracks.html) | 슬라이드 15장 | 공개 데이터 지형, 트랙 A·B·C, 6개월 일정 |
 | [doppler-protocol.html](doppler-protocol.html) | 슬라이드 17장 | 도플러 E/e′ 실험설계, 코호트·평가·킬 스위치 |
+| [reports/echo-ai-report.html](reports/echo-ai-report.html) | 서술형 9p | 종합 보고서 — AI 지형, 도플러 공백, 설계, 한계 |
 | [reports/mimic-open-data.html](reports/mimic-open-data.html) | 스크롤 문서 12p | 데이터 접근 문제, 주제 후보 5개, 12주 계획 |
 
 슬라이드는 키보드 `←`/`→` 로 이동, `f` 전체화면, `n` 발표자 노트.
