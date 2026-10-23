@@ -1,0 +1,106 @@
+/* deck-craft — slide tokens (1920×1080 stage)
+ * 발표 슬라이드용 토큰. 여기 값만 바꾸면 덱 전체 톤이 바뀐다.
+ * 컴포넌트 CSS(make-deck.py 안)에는 hex 를 쓰지 않는다.
+ *
+ * ⚠ 테마를 덱 주제·청중(학회/기업/정부/교육)마다 새로 유도한다(이 파일 값은 예시).
+ *   python3 ~/.config/opencode/skills/design-craft/scripts/theme-advisor.py \
+ *     --subject "<발표 주제>" --medium deck --mood "<청중 톤>" --write <임시파일>
+ *   → --color-*·--font-*·타이포·밀도를 교체하고 --stage-* 규격은 그대로 둔다.
+ *   청중→테마: academic editorial-serif/clinical-precise · corporate swiss-grid ·
+ *   government document-plain · education playful-geometric/warm-journal.
+ */
+:root {
+  /* stage */
+  --stage-w: 1920px;
+  --stage-h: 1080px;
+  --stage-pad-x: 140px;
+  --stage-pad-y: 110px;
+
+  /* surfaces — 발표장 조명에서는 밝은 배경 + 진한 글자가 가장 안전하다 */
+  --color-surface-0: #FBFAF8;
+  --color-surface-1: #F1EDE7;
+  --color-surface-2: #E4DED5;
+  --color-surface-inverse: #14120F;
+  --color-text-1: #14120F;
+  --color-text-2: #4C463E;
+  --color-text-3: #6F675B;   /* 대비 5.34:1 on surface-0 — 캡션도 4.5:1 을 넘긴다 */
+  --color-text-on-inverse: #F3EFE9;
+  --color-border: rgba(20, 18, 15, .16);
+  --color-border-strong: rgba(20, 18, 15, .34);
+  --color-accent: #B33A0B;
+  --color-accent-quiet: #EFD9CC;
+  --color-muted-bar: #C9C2B8;
+  --color-positive: #2F6F4E;
+  --color-negative: #A32A2A;
+
+  /* type — 발표장 뒤에서 읽히는 최소 크기 기준
+   * display 96 / h1 72 / h2 56 / body 36 / small 26 / caption 20
+   * 본문 최소 24pt(≈32px) 를 절대 내려가지 않는다. */
+  --font-display: "Fraunces", "Noto Serif KR", Georgia, serif;
+  --font-body: "Pretendard", "Sora", system-ui, sans-serif;
+  --text-display: 104px;
+  --text-h1: 76px;
+  --text-h2: 54px;
+  --text-h3: 40px;
+  --text-body: 36px;
+  --text-small: 26px;
+  --text-caption: 20px;
+  --text-kpi: 132px;
+
+  --leading-tight: 1.0;
+  --leading-heading: 1.12;
+  --leading-body: 1.45;
+  --tracking-display: -.025em;
+  --tracking-heading: -.02em;
+
+  /* space */
+  --space-1: 6px; --space-2: 12px; --space-3: 18px; --space-4: 24px;
+  --space-5: 36px; --space-6: 48px; --space-7: 72px; --space-8: 96px;
+
+  /* shape */
+  --radius-sm: 3px;
+  --radius-md: 8px;
+  --rule: 3px;
+
+  /* motion — 발표에서는 페이드 1종만 */
+  --duration-in: 260ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+
+  /* chart */
+  --chart-axis: rgba(20, 18, 15, .22);
+  --chart-grid: rgba(20, 18, 15, .10);
+  --chart-label: var(--color-text-2);
+}
+
+/* ── 이 덱의 테마: clinical-precise 변형 (cool) ──
+ * 주제: 심초음파 영상 AI · 청중: 학회(academic) · 매체: 16:9 발표
+ * 근거: 발표장 조명 → 밝은 바탕 + 진한 글자. 악센트는 청록 1색만.
+ */
+:root {
+  --color-surface-0: #F6F9FA;
+  --color-surface-1: #EAF1F3;
+  --color-surface-2: #DCE6EA;
+  --color-surface-inverse: #0B1E24;
+  --color-text-1: #0F171C;
+  --color-text-2: #3B4A51;
+  --color-text-3: #5D6468;
+  --color-text-on-inverse: #E8F1F3;
+  --color-border: rgba(15, 23, 28, .15);
+  --color-border-strong: rgba(15, 23, 28, .32);
+  --color-accent: #0E7490;
+  --color-accent-quiet: #D3E6EC;
+  --color-muted-bar: #B7C6CC;
+  --color-positive: #2D6A4B;
+  --color-negative: #9E2B2B;
+  --chart-axis: rgba(15, 23, 28, .22);
+  --chart-grid: rgba(15, 23, 28, .09);
+  --rule: 2px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --font-display: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  --font-body: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  --tracking-display: -.03em;
+  --tracking-heading: -.025em;
+}
+/* 접근성 — 키보드 포커스 링 */
+:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 4px; }

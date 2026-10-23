@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KSEcho 연구 자료 — 심초음파 AI · 오픈데이터</title>
+<meta name="description" content="한국심초음파학회(KSEcho) 투고를 위한 연구 자료 모음 — 공개 데이터 활용 전략, AI 연구 트랙, 도플러 E/e′ 실험설계.">
+<meta property="og:title" content="KSEcho 연구 자료 — 심초음파 AI · 오픈데이터">
+<meta property="og:description" content="공개 데이터 활용 전략 · AI 트랙 3개 · 도플러 E/e′ 실험설계">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230E7490'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --c-bg: #F6F9FA;
+    --c-surface: #FFFFFF;
+    --c-line: #DCE6EA;
+    --c-line-strong: #B7C6CC;
+    --c-ink: #0F171C;
+    --c-ink-2: #3B4A51;
+    --c-ink-3: #5D6468;
+    --c-accent: #0E7490;
+    --c-accent-quiet: #E4F0F4;
+    --pad-x: clamp(28px, 5vw, 96px);
+    --maxw: 1000px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    font-size: 1rem;
+    line-height: 1.68;
+    word-break: keep-all;
+    line-break: strict;
+    overflow-wrap: break-word;
+    hyphens: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+    padding-top: clamp(48px, 7vw, 104px);
+    padding-bottom: clamp(56px, 8vw, 120px);
+  }
+  .eyebrow {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--c-accent);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(1.75rem, 4.4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.16;
+    margin: 0 0 18px;
+    max-width: 20ch;
+  }
+  .lede {
+    font-size: 1.0625rem;
+    color: var(--c-ink-2);
+    max-width: 56ch;
+    margin: 0 0 12px;
+  }
+  .meta {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .75rem;
+    color: var(--c-ink-3);
+    letter-spacing: .04em;
+    margin-top: 26px;
+    padding-top: 14px;
+    border-top: 1px solid var(--c-line-strong);
+  }
+  h2 {
+    font-size: 1.0625rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin: 56px 0 6px;
+  }
+  .hint { font-size: .875rem; color: var(--c-ink-3); margin: 0 0 18px; }
+
+  .cards { display: grid; gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+  @media (min-width: 760px) { .cards { grid-template-columns: 1fr 1fr; } .cards--single { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--c-surface);
+    padding: 26px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card .num {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    letter-spacing: .14em;
+    color: var(--c-accent);
+  }
+  .card h3 {
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.34;
+    margin: 0;
+  }
+  .card p { margin: 0; font-size: .9375rem; color: var(--c-ink-2); }
+  .card .tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: auto; padding-top: 14px;
+  }
+  .tag {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .6875rem;
+    letter-spacing: .04em;
+    color: var(--c-ink-3);
+    border: 1px solid var(--c-line-strong);
+    padding: 2px 7px;
+  }
+  .card a.open {
+    display: inline-block;
+    margin-top: 6px;
+    font-weight: 700;
+    font-size: .9375rem;
+    color: var(--c-accent);
+    text-decoration: none;
+    border-bottom: 2px solid var(--c-accent);
+    align-self: flex-start;
+  }
+  .card a.open:hover { background: var(--c-accent-quiet); }
+  .card .alt { font-size: .8125rem; color: var(--c-ink-3); }
+  .card .alt a { color: var(--c-ink-2); }
+
+  ul.plain { list-style: none; margin: 0; padding: 0; }
+  ul.plain li {
+    border-top: 1px solid var(--c-line);
+    padding: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    align-items: baseline;
+    font-size: .9375rem;
+  }
+  ul.plain li:last-child { border-bottom: 1px solid var(--c-line); }
+  ul.plain .k {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .75rem;
+    color: var(--c-ink-3);
+    min-width: 168px;
+  }
+  ul.plain a { color: var(--c-ink); }
+  ul.plain a:hover { color: var(--c-accent); }
+
+  footer {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: 0;
+    margin-inline: auto;
+    max-width: var(--maxw);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .75rem;
+    color: var(--c-ink-3);
+    line-height: 1.7;
+  }
+  .wrap--foot { padding-top: 0; padding-bottom: 64px; }
+  a { color: var(--c-accent); }
+  :focus-visible { outline: 3px solid var(--c-accent); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">KSEcho / JCVI · 연구 자료</p>
+  <h1>심초음파 영상 AI로 논문 쓰기</h1>
+  <p class="lede">공개 데이터로 어디까지 가능한지, 무엇이 비어 있는지, 도플러 E/e′를 실제로 어떻게 자동화할지. 슬라이드 덱 세 편으로 정리했다.</p>
+  <p class="meta">최종 갱신 2026-10-23 · 데이터 출처 PhysioNet MIMIC-IV-ECHO v1.0.1, EchoNet-Dynamic, CAMUS · 학술지 Journal of Cardiovascular Imaging</p>
+
+  <h2>덱</h2>
+  <p class="hint">HTML은 발표용 — 키보드 ←/→ 이동, <b>f</b> 전체화면, <b>n</b> 발표자 노트.</p>
+  <div class="cards">
+    <div class="card">
+      <span class="num">01 · 방향</span>
+      <h3>영상 AI는 EF에서 끝났고, 도플러에서 비어 있다</h3>
+      <p>공개 데이터 3종의 역할, 비어 있는 연구 영역, 트랙 A·B·C와 6개월 일정.</p>
+      <div class="tags"><span class="tag">15장</span><span class="tag">약 10분</span><span class="tag">전략</span></div>
+      <a class="open" href="ai-tracks.html">슬라이드 열기</a>
+      <span class="alt">PDF · <a href="pdf/ai-tracks.pdf">ai-tracks.pdf</a></span>
+    </div>
+    <div class="card">
+      <span class="num">02 · 설계</span>
+      <h3>도플러에서 E/e′를 뽑는다 — 4단계, 24주, 논문 3편</h3>
+      <p>구성요소 경로, 코호트 4단 필터, 평가 3층, 환자 단위 분할, 킬 스위치 4개.</p>
+      <div class="tags"><span class="tag">17장</span><span class="tag">약 11분</span><span class="tag">프로토콜</span></div>
+      <a class="open" href="doppler-protocol.html">슬라이드 열기</a>
+      <span class="alt">PDF · <a href="pdf/doppler-protocol.pdf">doppler-protocol.pdf</a></span>
+    </div>
+  </div>
+
+  <h2>보고서</h2>
+  <p class="hint">스크롤 문서 형식. 데이터 접근 문제와 주제 후보를 정리한 1차 보고서.</p>
+  <div class="cards cards--single">
+    <div class="card">
+      <span class="num">03 · 보고서</span>
+      <h3>받을 필요가 없다 — 4천만 행짜리 표 하나면 된다</h3>
+      <p>MIMIC-IV-ECHO 구조, DICOM 없이 쓰는 세 가지 경로, 주제 후보 5개, 12주 계획.</p>
+      <div class="tags"><span class="tag">12p</span><span class="tag">스크롤</span><span class="tag">데이터</span></div>
+      <a class="open" href="reports/mimic-open-data.html">문서 열기</a>
+      <span class="alt">PDF · <a href="pdf/mimic-open-data.pdf">mimic-open-data.pdf</a></span>
+    </div>
+  </div>
+
+  <h2>원본 파일</h2>
+  <ul class="plain">
+    <li><span class="k">덱 소스 (JSON)</span><a href="source/ai-tracks.deck.json">ai-tracks.deck.json</a> · <a href="source/doppler-protocol.deck.json">doppler-protocol.deck.json</a></li>
+    <li><span class="k">발표자 노트</span><a href="notes/ai-tracks-speaker.md">ai-tracks-speaker.md</a> · <a href="notes/doppler-protocol-speaker.md">doppler-protocol-speaker.md</a></li>
+    <li><span class="k">테마 토큰</span><a href="source/deck-theme.css">deck-theme.css</a></li>
+  </ul>
+</div>
+
+<footer><div class="wrap wrap--foot">
+  <p>환자 정보 없음 — 모든 수치는 공개 데이터셋 기술 문서와 학회 공지에 근거한다.<br>
+  확인하지 못한 값은 문서 안에 &ldquo;확인 필요&rdquo;로 표시했다.</p>
+</div></footer>
+</body>
+</html>

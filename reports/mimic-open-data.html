@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KSEcho 투고 전략 — MIMIC-IV-ECHO 오픈데이터 활용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* design-craft — theme-advisor 로 생성한 토큰 (테마 전체).
+ * theme: terminal-mono (터미널 모노 (기술·데이터)) · fingerprint: terminal-mono|mono-terminal|compressed|hard|scanlines|dark
+ * color family: deep-ink (딥 네이비 잉크 + 황동) · accent #1D4ED8 · 매체 deck · 대상 심초음파 오픈데이터 연구 제안서
+ * 타이포: 모노 터미널 · 밀도: 압축 · 질감: 스캔라인 · 모션: 거의 없음
+ * 이미지: 차트·표
+ * 규칙: 어두운 배경 + 형광 1색. 모노 라벨, 표가 화면을 채운다
+ * 모션 주의: 인쇄·문서형. 페이드만, 큰 이동 금지
+ */
+:root {
+  --color-surface-0: #101828;
+  --color-surface-1: #1E2635;
+  --color-surface-2: #2D3442;
+  --color-surface-inverse: #F7F6F3;
+  --color-surface-overlay: rgba(16, 24, 40, 0.78);
+  --color-text-1: #F5F3F0;
+  --color-text-2: #B5B6B8;
+  --color-text-3: #CCCCCC;
+  --color-text-on-inverse: #101828;
+  --color-text-on-accent: #101828;
+  --color-border: rgba(255, 255, 255, 0.16);
+  --color-border-strong: rgba(255, 255, 255, 0.34);
+  --color-accent: #7C99E8;
+  --color-accent-quiet: #283452;
+  --color-accent-strong: #B0C2F1;
+  --color-focus: #1D4ED8;
+  --color-positive: #2D6A4B;
+  --color-warning: #7F5700;
+  --color-negative: #A32A2A;
+  --font-display: "JetBrains Mono", "D2Coding", ui-monospace, monospace;
+  --font-body: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "D2Coding", ui-monospace, monospace;
+  --text-display: clamp(1.9rem, 4.2vw, 3.25rem);
+  --text-h1: 2.25rem;
+  --text-h2: 1.5rem;
+  --text-h3: 1.0625rem;
+  --text-body: 0.9375rem;
+  --text-small: 0.8125rem;
+  --leading-body: 1.62;
+  --leading-heading: 1.12;
+  --tracking-display: -0.01em;
+  --tracking-body: 0;
+  --space-base: 2px;
+  --space-4: 10px;
+  --space-12: 28px;
+  --space-24: 48px;
+  --section-y: clamp(28px, 3.5vw, 56px);
+  --section-y-lg: clamp(44px, 5vw, 88px);
+  --container-max: 1320px;
+  --pad-x: clamp(28px, 4.5vw, 72px);
+  --maxw: 1320px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-pill: 0px;
+  --shadow-lift: none;
+  --shadow-overlay: 8px 8px 0 0 var(--color-text-1);
+  --surface-texture: scanlines(3px, .04);
+  --surface-bg-extra: none;
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-scene: 320ms;
+  --ease-standard: cubic-bezier(.4,0,.2,1);
+  --stagger-step: 40ms;
+}
+
+/* 질감은 배경 레이어로 구현한다(토큰 값만 보고 손으로 hex 를 만들지 않는다):
+   --surface-texture: grain|scanlines|grid|dots|duotone|none  ·  --surface-bg-extra: 배경 레이어 */
+/* 인쇄(PDF·책)면 질감·그림자를 끄고 괘선·굵기로 위계를 만든다. */
+
+:root { --color-negative-soft: #E9A0A0; }
+
+</style>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--color-surface-0);
+    color: var(--color-text-1);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    word-break: keep-all;
+    line-break: strict;
+    overflow-wrap: break-word;
+    hyphens: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* 스캔라인 질감 — 배경 레이어 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.028) 0px,
+      rgba(255,255,255,.028) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+  .slide {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+    padding-top: var(--section-y);
+    padding-bottom: var(--section-y);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .slide:last-of-type { border-bottom: 0; }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: .6875rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin: 0 0 10px;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .kicker .idx { color: var(--color-text-2); }
+
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: var(--tracking-display); line-height: var(--leading-heading); margin: 0; }
+  h1 { font-size: var(--text-display); font-weight: 700; max-width: 24ch; letter-spacing: -0.022em; }
+  h2 { font-family: var(--font-body); font-size: 1.6875rem; font-weight: 800; letter-spacing: -0.025em; line-height: 1.28; max-width: 34ch; margin-bottom: 22px; }
+  h2 + .lede { margin-top: -8px; }
+  h3 { font-size: var(--text-h3); font-family: var(--font-body); font-weight: 700; letter-spacing: 0; }
+
+  .lede {
+    font-size: 1.0625rem;
+    color: var(--color-text-3);
+    max-width: 62ch;
+    margin: 14px 0 0;
+  }
+  p { margin: 0 0 12px; max-width: 68ch; color: var(--color-text-2); }
+  p strong, li strong { color: var(--color-text-1); font-weight: 700; }
+
+  ul, ol { margin: 0; padding-left: 1.15em; max-width: 68ch; }
+  li { margin-bottom: 8px; color: var(--color-text-2); }
+  li::marker { color: var(--color-accent); font-family: var(--font-mono); }
+
+  .rule { height: 1px; background: var(--color-border); margin: 26px 0; border: 0; }
+
+  /* 상단 상태 바 */
+  .cover-bar {
+    display: flex; flex-wrap: wrap; gap: 8px 24px;
+    font-family: var(--font-mono); font-size: .6875rem;
+    color: var(--color-text-2); letter-spacing: .04em;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border-strong);
+  }
+  .cover-bar b { color: var(--color-text-1); font-weight: 600; }
+
+  /* 결론 블록 */
+  .verdict {
+    margin-top: 30px;
+    padding: 22px 24px;
+    background: var(--color-accent-quiet);
+    border-left: 3px solid var(--color-accent);
+  }
+  .verdict p { margin: 0; color: var(--color-text-1); font-size: 1.0625rem; max-width: 60ch; }
+  .verdict .tag { font-family: var(--font-mono); font-size: .6875rem; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent-strong); display: block; margin-bottom: 8px; }
+
+  /* 숫자 행 */
+  .figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--color-border); margin: 26px 0; }
+  .fig { background: var(--color-surface-0); padding: 18px 16px; }
+  .fig .n { font-family: var(--font-mono); font-size: 1.75rem; font-weight: 700; color: var(--color-text-1); display: block; line-height: 1.05; }
+  .fig .u { font-family: var(--font-mono); font-size: .6875rem; color: var(--color-accent); display: block; margin-top: 6px; letter-spacing: .06em; }
+  .fig .d { font-size: .8125rem; color: var(--color-text-2); display: block; margin-top: 8px; }
+
+  /* 2단 */
+  .cols { display: grid; gap: 32px; }
+  @media (min-width: 900px) { .cols.two { grid-template-columns: 1.05fr .95fr; } .cols.three { grid-template-columns: repeat(3, 1fr); } }
+
+  /* 표 — 좌우 기준선 유지 */
+  table { width: 100%; max-width: 100%; table-layout: fixed; border-collapse: collapse; font-size: .875rem; margin: 8px 0 4px; }
+  caption { text-align: left; font-family: var(--font-mono); font-size: .6875rem; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-2); padding-bottom: 8px; }
+  th, td { text-align: left; padding: 10px 14px 10px 0; overflow-wrap: break-word; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: .6875rem; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-2); font-weight: 600; border-bottom-color: var(--color-border-strong); }
+  td:first-child { color: var(--color-text-1); font-weight: 600; }
+  td { color: var(--color-text-2); }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--color-text-1); }
+
+  .pill { display: inline-block; font-family: var(--font-mono); font-size: .6875rem; letter-spacing: .06em; padding: 2px 7px; border: 1px solid var(--color-border-strong); color: var(--color-text-2); white-space: nowrap; }
+  .pill.ok { border-color: var(--color-accent); color: var(--color-accent-strong); }
+  .pill.no { border-color: var(--color-negative); color: var(--color-negative-soft); }
+
+  .note { font-family: var(--font-mono); font-size: .75rem; color: var(--color-text-2); border-top: 1px dashed var(--color-border-strong); padding-top: 10px; margin-top: 18px; }
+  .note b { color: var(--color-text-1); }
+
+  code { font-family: var(--font-mono); font-size: .875em; background: var(--color-surface-1); padding: 1px 5px; color: var(--color-accent-strong); }
+
+  .step { display: grid; grid-template-columns: 62px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--color-border); }
+  .step:last-child { border-bottom: 0; }
+  .step .w { font-family: var(--font-mono); font-size: .8125rem; color: var(--color-accent); padding-top: 2px; }
+  .step h3 { margin-bottom: 4px; }
+  .step p { margin: 0; font-size: .9375rem; }
+
+  .risk { border-left: 2px solid var(--color-negative); padding-left: 14px; margin-bottom: 14px; }
+  .risk h3 { font-size: .9375rem; margin-bottom: 2px; }
+  .risk p { font-size: .875rem; margin: 0; }
+  .fix { color: var(--color-accent-strong); }
+
+  footer { max-width: 1280px; margin-inline: auto; padding: 24px var(--pad-x) 56px; font-family: var(--font-mono); font-size: .6875rem; color: var(--color-text-2); display: flex; justify-content: space-between; gap: 16px; }
+
+  a { color: var(--color-accent-strong); }
+  :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .slide > * { animation: rise var(--duration-scene) var(--ease-standard) both; }
+    .slide > *:nth-child(2) { animation-delay: calc(var(--stagger-step) * 1); }
+    .slide > *:nth-child(3) { animation-delay: calc(var(--stagger-step) * 2); }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+
+  @media (max-width: 620px) {
+    table { font-size: .8125rem; }
+    th, td { padding: 8px 8px 8px 0; }
+    .step { grid-template-columns: 48px 1fr; gap: 10px; }
+    .pill { white-space: normal; }
+    .figures { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media print {
+    @page { size: A4 landscape; margin: 8mm; }
+    body::before { display: none; }
+    .slide { break-after: page; max-width: none; padding-top: 10mm; padding-bottom: 10mm; }
+    .slide > * { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<section class="slide">
+  <div class="cover-bar">
+    <span><b>KSEcho / JCVI</b> 투고 전략</span>
+    <span>주제: MIMIC-IV-ECHO 오픈데이터</span>
+    <span>2026-10-23</span>
+    <span>v2 · 데이터 접근성 재설계</span>
+  </div>
+  <p class="kicker"><span class="idx">01</span><span>결론 먼저</span></p>
+  <h1>받을 필요가 없다.<br>4,000만 행짜리 표 하나만 있으면 된다.</h1>
+  <div class="verdict">
+    <span class="tag">결론</span>
+    <p>MIMIC-IV-ECHO에서 <strong>DICOM 52만 파일은 이번 연구에 불필요</strong>하다. 측정값은 <code>structured_measurement.csv</code> 한 파일에 있고, 요약 테이블은 BigQuery로 질의할 수 있다. 주제는 <strong>경증 판막질환의 예후</strong>를 1순위로 잡는다 — 변수 가용성이 가장 높고, "경증이라도 추적해야 하나"라는 임상 질문이 명확하다.</p>
+  </div>
+  <p class="lede" style="margin-top:24px">이 문서는 PhysioNet 계정은 있으나 데이터 용량 때문에 막힌 상황을 전제로, ① 받지 않고 쓰는 3가지 경로 ② 그 데이터로 되는 주제 5개 ③ 12주 실행안을 담는다.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">02</span><span>진단</span></p>
+  <h2>막힌 것은 데이터가 아니라 "다운로드"라는 가정이다</h2>
+  <div class="figures">
+    <div class="fig"><span class="n">206,488</span><span class="u">검사 (structured)</span><span class="d">TTE 179,928 · stress 16,389 · TEE 10,171</span></div>
+    <div class="fig"><span class="n">91,372</span><span class="u">환자</span><span class="d">MIMIC-IV 임상DB와 subject_id 연결</span></div>
+    <div class="fig"><span class="n">524,137</span><span class="u">DICOM 파일</span><span class="d">7,228 검사 · 4,572명 — 이번엔 불필요</span></div>
+    <div class="fig"><span class="n">180–230</span><span class="u">측정/검사</span><span class="d">long format, 1행 = 1측정</span></div>
+  </div>
+  <div class="cols two">
+    <div>
+      <h3>문제의 실체</h3>
+      <ul>
+        <li>용량의 99%는 <strong>DICOM 이미지</strong>다. 52만 파일, 수백 GB.</li>
+        <li>정작 분석에 쓰는 값은 <strong>카디올로지스트가 기록한 숫자</strong>다.</li>
+        <li>즉 "전체 다운로드"는 연구 설계상 <strong>과잉</strong>이다.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>추가로 확인된 제약</h3>
+      <ul>
+        <li>일부(769검사/437명)는 <strong>hidden test set</strong>으로 withheld — 전체 모집단이 아님.</li>
+        <li>DICOM과 측정값을 잇는 직접 ID가 없어 <strong>±2일 시간 연결</strong> 테이블을 따로 제공.</li>
+        <li>2026년 Nature Sci Data 논문으로 공식 기술 — 인용 근거가 명확.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">출처: <b>PhysioNet MIMIC-IV-ECHO v1.0.1</b> 데이터 기술 페이지 · Gow et al., Sci Data 2026</p>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">03</span><span>해법</span></p>
+  <h2>받지 않고 쓰는 세 가지 경로 — 위에서부터 시도</h2>
+  <table>
+    <caption>접근 경로</caption>
+    <thead><tr><th style="width:26%">경로</th><th style="width:34%">무엇을 하는가</th><th>판정</th></tr></thead>
+    <tbody>
+      <tr><td>A. BigQuery 질의</td><td>PhysioNet 공개 BigQuery에 요약 테이블이 안내되어 있다. 필요한 컬럼만 SQL로 뽑아 CSV 수십 MB로 내려받는다.</td><td><span class="pill ok">1순위</span> 데이터 이동 0</td></tr>
+      <tr><td>B. CSV만 선택 다운로드</td><td><code>structured_measurement.csv</code> + <code>echo-study-list.csv</code> + <code>echo-record-list.csv</code>. <code>files/</code> 디렉터리는 받지 않는다.</td><td><span class="pill ok">현실적</span> 수 GB 이내</td></tr>
+      <tr><td>C. 부분 DICOM</td><td>영상이 꼭 필요할 때만 subject_id 단위로 소량. 예: 측정 신뢰도 검증용 100검사.</td><td><span class="pill">3순위</span> 영상연구 아니면 불필요</td></tr>
+    </tbody>
+  </table>
+  <div class="rule"></div>
+  <div class="cols two">
+    <div>
+      <h3>왜 BigQuery가 답인가</h3>
+      <p>long format은 검사 1건당 200행이다. 2억 행을 로컬로 가져오면 노트북이 죽는다. SQL로 <code>WHERE measurement_description IN (...)</code> 필터를 걸면 <strong>분석에 쓰는 표는 수십만 행</strong>으로 줄어든다. 즉 다운로드 문제가 사라진다.</p>
+    </div>
+    <div>
+      <h3>먼저 할 30분</h3>
+      <p>BigQuery 콘솔에서 <code>SELECT measurement_description, count(*)</code> 한 줄로 <strong>변수 인벤토리</strong>를 뽑는다. 이 표가 이후 모든 설계의 근거가 된다. 접속 경로·데이터셋 이름은 계정 로그인 후 확인 필요.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">04</span><span>데이터 구조</span></p>
+  <h2>변수는 "이름"이 아니라 "설명"으로 찾는다</h2>
+  <p><code>structured_measurement.csv</code>의 컬럼은 8개뿐이다. 값은 전부 long format으로 쌓여 있다.</p>
+  <table>
+    <caption>structured_measurement.csv</caption>
+    <thead><tr><th style="width:30%">컬럼</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr><td>subject_id</td><td>MIMIC-IV 전체와 공통인 환자 ID — 사망·진단·검사 연결 키</td></tr>
+      <tr><td>measurement_id</td><td>검사 1건 식별자 (한 검사의 200여 행이 같은 값)</td></tr>
+      <tr><td>measurement_datetime</td><td>비식별화된 검사 시각 — 시간순·생존분석 기준</td></tr>
+      <tr><td>test_type</td><td>TTE / TEE / stress — <strong>TTE만 쓰면 모집단이 깨끗해진다</strong></td></tr>
+      <tr><td>measurement / measurement_description</td><td>측정 항목 ID와 이름 — <strong>여기서 변수를 고른다</strong></td></tr>
+      <tr><td>result / unit</td><td>값과 단위. 단위가 섞여 있으므로 반드시 unit으로 교차 확인</td></tr>
+    </tbody>
+  </table>
+  <p class="note"><b>실무 팁</b> — <code>result</code>는 문자열로 저장된 경우가 있어 숫자 캐스팅 전에 이상값(<code>&lt;10</code>, <code>N/A</code>, 공백)을 먼저 세야 한다. 버전 간 변수명 변경도 있으니 전처리 스크립트에 매핑 테이블을 두는 게 안전하다.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">05</span><span>함정</span></p>
+  <h2>이 데이터셋의 진짜 위험은 결측이 아니라 "결측처럼 보이는 것"</h2>
+  <div class="cols two">
+    <div>
+      <h3>소스 시스템이 중간에 바뀌었다</h3>
+      <p>연구 기간 중 심초음파 랩 시스템이 교체되어 <strong>같은 개념의 변수명이 달라졌다</strong>. 공식 문서의 예: 한 시스템은 <code>lvef</code>·<code>lvef_upper</code>, 다른 시스템은 <code>biplane_lvef</code>·<code>lvef_3d</code>.</p>
+      <p>따라서 <strong>변수가 없는 것은 임상적 결측이 아닐 수 있다</strong>. 이걸 무시하면 "E/e′는 30%만 기록되었다"는 결론이 사실은 "구 시스템에는 그 변수 자체가 없었다"가 된다.</p>
+    </div>
+    <div>
+      <h3>그래서 설계에 반드시 넣을 것</h3>
+      <ul>
+        <li>검사일 기준 <strong>시대 구분(era) 변수</strong>를 만들고, 시대별 변수 가용성 표를 먼저 출력한다.</li>
+        <li>주 분석은 <strong>변수가 양쪽 시대에 모두 존재하는 항목</strong>으로 한정한다.</li>
+        <li>민감도 분석: era를 층화하거나 상호작용항으로 넣는다.</li>
+        <li>이 표 자체를 <strong>보충자료 1</strong>로 넣으면 심사에서 신뢰를 얻는다.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verdict" style="margin-top:26px">
+    <span class="tag">이 함정이 곧 두 번째 논문</span>
+    <p>"소스 시스템 전환으로 인한 변수 부재가 심초음파 역학 연구의 결론을 바꾸는가" — 아직 정리된 사례가 드문 방법론 주제다. 다만 JCVI보다는 의료정보학 저널이 맞다.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">06</span><span>주제 후보</span></p>
+  <h2>되는 주제 5개 — 변수 가용성과 임상 질문으로 줄 세운다</h2>
+  <table>
+    <caption>후보 · 근거 · 판정</caption>
+    <thead><tr><th style="width:24%">주제</th><th style="width:36%">핵심 질문</th><th style="width:22%">필요 변수</th><th>판정</th></tr></thead>
+    <tbody>
+      <tr><td>T1. 경증 판막질환의 예후</td><td>경증 AS·MR·TR은 정말 양성인가? 중등도로 진행하지 않아도 사망과 연관되는가</td><td>판막별 중증도 등급, 대동맥 판막 속도·평균압력차, LVEF</td><td><span class="pill ok">1순위</span></td></tr>
+      <tr><td>T2. E/e′와 사망</td><td>LVEF 보존군에서 E/e′ 상승이 독립적 예후인자인가</td><td>E/e′, E/A, TR velocity, LA 용적, LVEF</td><td><span class="pill ok">2순위</span> 가용성 확인 필요</td></tr>
+      <tr><td>T3. LVEF와 사망의 U자</td><td>HFmrEF 구간이 가장 나쁜가, 아니면 저LVEF가 단조증가인가</td><td>LVEF, 사망일</td><td><span class="pill">경쟁 많음</span></td></tr>
+      <tr><td>T4. 우심실 기능</td><td>TAPSE 저하가 좌심 기능과 독립적으로 사망을 예측하는가</td><td>TAPSE, RVSP, RV 크기</td><td><span class="pill">가용성 변동</span></td></tr>
+      <tr><td>T5. 대동맥근 확장</td><td>무증상 대동맥근 확장의 유병률과 예후</td><td>대동맥근 직경, 판막 상태</td><td><span class="pill no">단일기관 한계</span></td></tr>
+    </tbody>
+  </table>
+  <p class="note"><b>판정 기준</b> — ① 변수 기록률 ② 임상적 행동 변화 유도 여부 ③ JCVI 심사에서 "한국 일반화" 질문을 견딜 수 있는가. 변수명은 접속 후 인벤토리로 확정하며, 이 표의 변수는 <b>표준 심초음파 측정 항목 기준 추정</b>이다.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">07</span><span>1순위 설계</span></p>
+  <h2>T1 — "경증"이라는 라벨을 다시 심판한다</h2>
+  <div class="cols two">
+    <div>
+      <h3>PICO</h3>
+      <table>
+        <tbody>
+          <tr><td style="width:24%">P</td><td>TTE 시행 성인, 판막 중증도 경증으로 판정된 군 (AS / MR / TR 각각)</td></tr>
+          <tr><td>E</td><td>경증 판막질환 vs 정상 판막</td></tr>
+          <tr><td>C</td><td>같은 코호트 내 판막 정상군</td></tr>
+          <tr><td>O</td><td>1차: 전원 사망. 2차: 심부전 입원, 중등도 이상 진행(반복 초음파가 있는 경우)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>분석</h3>
+      <ul>
+        <li>Cox 비례위험, era·나이·성·LVEF·eGFR·동반판막질환 보정</li>
+        <li>경증 단독 vs 경증 중복(2개 이상) 군 비교 — <strong>여기가 새로움</strong></li>
+        <li>경쟁위험(비심장 사망) 모형을 민감도 분석으로</li>
+        <li>표 3개 · 그림 2개(생존곡선, 판막별 forest)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verdict" style="margin-top:22px">
+    <span class="tag">왜 이 주제인가</span>
+    <p>경증 판막질환은 검진·외래에서 <strong>"경증이니 1년 뒤 보자"</strong>로 끝나는 가장 흔한 장면이다. 그 관행이 데이터로 지지되는지 묻는 논문은 임상의가 바로 인용한다. 심초음파학회지 독자와 정확히 겹친다.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">08</span><span>사전부검</span></p>
+  <h2>실패한다면 이 다섯 가지 때문이다</h2>
+  <div class="cols two">
+    <div>
+      <div class="risk"><h3>① 판막 중증도가 등급이 아니라 텍스트</h3><p>판독문 자유기술로만 남아 있으면 등급 변수가 없다. <span class="fix">→ 인벤토리에서 등급형 변수 존재를 먼저 확인. 없으면 T2로 즉시 전환.</span></p></div>
+      <div class="risk"><h3>② 시대 불균형</h3><p>구 시스템 시대에 경증 라벨이 몰려 있으면 시대가 교란변수가 된다. <span class="fix">→ 시대 층화 + 상호작용항.</span></p></div>
+      <div class="risk"><h3>③ 반복 초음파 결측</h3><p>"진행"을 2차 결과로 잡으면 표본이 급감한다. <span class="fix">→ 진행은 exploratory로만 두고 1차는 사망.</span></p></div>
+    </div>
+    <div>
+      <div class="risk"><h3>④ 교란 by indication</h3><p>초음파를 찍은 이유 자체가 예후다. <span class="fix">→ 입원·응급 vs 외래 strata, Charlson 보정, E-value 제시.</span></p></div>
+      <div class="risk"><h3>⑤ 단일기관·미국 코호트</h3><p>심사에서 일반화 가능성을 반드시 묻는다. <span class="fix">→ 서론에서 한국 판막질환 역학 문헌과 대조, 한계 절에 명시.</span></p></div>
+    </div>
+  </div>
+  <p class="note"><b>게이트</b> — ①이 해결되지 않으면 12주 계획 전체를 T2로 갈아탄다. 판정은 인벤토리 확인 후 <b>3일 이내</b>에 한다.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">09</span><span>실행</span></p>
+  <h2>12주 — 8주에 초록, 11주에 투고</h2>
+  <div>
+    <div class="step"><span class="w">W0</span><div><h3>접근 확정</h3><p>PhysioNet DUA 확인 → BigQuery 접속 또는 CSV 선택 다운로드. CITI 교육 이수 상태 점검.</p></div></div>
+    <div class="step"><span class="w">W1</span><div><h3>변수 인벤토리 · GO/NO-GO</h3><p><code>measurement_description</code> 빈도표 + 시대별 가용성 교차표. 판막 등급 변수 유무로 T1/T2 결정.</p></div></div>
+    <div class="step"><span class="w">W2–3</span><div><h3>코호트 정의</h3><p>TTE만, 성인, 판막질환별 경증군/정상군. 환자당 지수검사 1건만(중복검사 제거 규칙 명시).</p></div></div>
+    <div class="step"><span class="w">W4–5</span><div><h3>결과변수 · 공변량</h3><p>MIMIC-IV에서 사망일·입원·동반질환 추출. 결측 처리 규칙과 E-value 사전 계산.</p></div></div>
+    <div class="step"><span class="w">W6–8</span><div><h3>분석 · 초록</h3><p>Cox + 경쟁위험, 표 3개·그림 2개. 8주차에 학회 초록 초안 완성(KSE 2027 춘계 대비).</p></div></div>
+    <div class="step"><span class="w">W9–11</span><div><h3>원고 · JCVI 투고</h3><p>STROBE 체크리스트, 보충자료에 변수 인벤토리 표. 코드는 GitHub 공개(데이터는 DUA상 불가).</p></div></div>
+  </div>
+  <p class="note"><b>KSE 2027</b> — 2026 추계 초록은 9/28 마감으로 지났다. 다음 창은 2027 춘계(통상 5–6월, 초록 3–4월)이며 <b>정확한 일정은 학회 공지 확인 필요</b>.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker"><span class="idx">10</span><span>다음 한 걸음</span></p>
+  <h2>오늘 결정할 것 두 가지</h2>
+  <div class="cols two">
+    <div>
+      <h3>결정 1 — 접근 경로</h3>
+      <p>BigQuery 질의를 먼저 시도한다. 막히면 CSV 선택 다운로드로 내려간다. 어느 쪽이든 <strong>DICOM은 받지 않는다</strong>.</p>
+      <h3 style="margin-top:22px">결정 2 — 1순위 주제</h3>
+      <p>T1(경증 판막질환)으로 간다. 단, <strong>W1 인벤토리에서 판막 등급 변수가 없으면 T2(E/e′)</strong> 로 즉시 전환한다.</p>
+    </div>
+    <div style="background:var(--color-surface-1); padding:22px 24px; border-left:3px solid var(--color-accent);">
+      <h3>지금 30분 안에 하는 일</h3>
+      <ol style="margin-top:10px">
+        <li>BigQuery 콘솔에서 <code>measurement_description</code> 빈도 상위 100개를 뽑는다.</li>
+        <li>그 안에 판막 중증도·E/e′·TAPSE가 있는지 눈으로 확인한다.</li>
+        <li>결과에 따라 T1 또는 T2로 확정하고, 이 문서의 07장을 그 주제로 고쳐 쓴다.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="verdict" style="margin-top:26px">
+    <span class="tag">한 줄</span>
+    <p>용량 문제는 이미 해결되어 있다. 남은 리스크는 기술이 아니라 <strong>변수 인벤토리를 언제 보느냐</strong>다.</p>
+  </div>
+</section>
+
+<footer>
+  <span>KSEcho 투고 전략 · MIMIC-IV-ECHO · 2026-10-23</span>
+  <span>데이터 출처: PhysioNet MIMIC-IV-ECHO v1.0.1 · JCVI(e-jcvi.org)</span>
+</footer>
+
+</body>
+</html>
