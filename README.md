@@ -13,6 +13,7 @@
 | [ai-tracks.html](ai-tracks.html) | 슬라이드 15장 | 공개 데이터 지형, 트랙 A·B·C, 6개월 일정 |
 | [doppler-protocol.html](doppler-protocol.html) | 슬라이드 17장 | 도플러 E/e′ 실험설계, 코호트·평가·킬 스위치 |
 | [wall-motion.html](wall-motion.html) | 슬라이드 16장 | 벽운동 eyeball 판독 보조 경량 모델, 오픈데이터만 |
+| [reader-study.html](reader-study.html) | 슬라이드 17장 | 판독자 연구(MRMC) 프로토콜 · 프로토타입 검증 |
 | [reports/echo-ai-report.html](reports/echo-ai-report.html) | 서술형 9p | 종합 보고서 — AI 지형, 도플러 공백, 설계, 한계 |
 | [reports/mimic-open-data.html](reports/mimic-open-data.html) | 스크롤 문서 12p | 데이터 접근 문제, 주제 후보 5개, 12주 계획 |
 
@@ -21,10 +22,20 @@
 ## 구조
 
 ```
+code/     프로토타입 스크립트 + 데모 출력
 pdf/      인쇄·배포용 PDF
 notes/    슬라이드별 발표자 노트 (markdown)
 source/   덱 소스(JSON) · 테마 토큰(CSS)
 reports/  스크롤 보고서
+```
+
+## 코드
+
+`code/segment_map.py` — CAMUS 심내막 경계에서 구역별 내향 변위 지수를 계산.
+데모 모드는 데이터 없이 실행된다.
+
+```bash
+python3 code/segment_map.py --demo --impaired mid_septal
 ```
 
 ## 데이터 출처

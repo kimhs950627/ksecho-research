@@ -84,8 +84,7 @@
   .hint { font-size: .875rem; color: var(--c-ink-3); margin: 0 0 18px; }
 
   .cards { display: grid; gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
-  @media (min-width: 760px) { .cards { grid-template-columns: 1fr 1fr; } .cards--single { grid-template-columns: 1fr; } .cards--three { grid-template-columns: 1fr; } }
-  @media (min-width: 1040px) { .cards--three { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 760px) { .cards { grid-template-columns: 1fr 1fr; } .cards--single { grid-template-columns: 1fr; } }
   .card {
     background: var(--c-surface);
     padding: 26px 24px 24px;
@@ -178,7 +177,7 @@
 
   <h2>덱</h2>
   <p class="hint">HTML은 발표용 — 키보드 ←/→ 이동, <b>f</b> 전체화면, <b>n</b> 발표자 노트.</p>
-  <div class="cards cards--three">
+  <div class="cards">
     <div class="card">
       <span class="num">01 · 방향</span>
       <h3>영상 AI는 EF에서 끝났고, 도플러에서 비어 있다</h3>
@@ -203,13 +202,35 @@
       <a class="open" href="wall-motion.html">슬라이드 열기</a>
       <span class="alt">PDF · <a href="pdf/wall-motion.pdf">wall-motion.pdf</a></span>
     </div>
+    <div class="card">
+      <span class="num">04 · 검증</span>
+      <h3>판독자 연구 프로토콜 + 돌아가는 프로토타입</h3>
+      <p>MRMC 교차 설계, 케이스·정답 구성, 혼합효과 분석. 그리고 지금 실행되는 구역 지수 스크립트.</p>
+      <div class="tags"><span class="tag">17장</span><span class="tag">약 11분</span><span class="tag">프로토콜</span></div>
+      <a class="open" href="reader-study.html">슬라이드 열기</a>
+      <span class="alt">PDF · <a href="pdf/reader-study.pdf">reader-study.pdf</a></span>
+    </div>
+  </div>
+
+
+  <h2>코드</h2>
+  <p class="hint">데모 모드 내장 — 데이터 없이 바로 실행된다. 출력은 6구역 지도와 한 줄 판정.</p>
+  <div class="cards cards--single">
+    <div class="card">
+      <span class="num">code · v0.1</span>
+      <h3>segment_map.py — 구역별 내향 변위 지수</h3>
+      <p>ED/ES 심내막 경계에서 r(θ)를 뽑아 6구역으로 나누고, 정상 분포 대비 z로 판정한다. 합성 저운동 구역을 주입해 자체 검증까지 포함.</p>
+      <div class="tags"><span class="tag">numpy</span><span class="tag">matplotlib</span><span class="tag">SimpleITK (CAMUS)</span></div>
+      <a class="open" href="code/segment_map.py">스크립트 열기</a>
+      <span class="alt"><a href="code/README.md">README</a> · <a href="code/demo_map.png">데모 출력 그림</a></span>
+    </div>
   </div>
 
   <h2>보고서</h2>
   <p class="hint">서술형. 위에서부터 읽는 문서 두 편 — 종합 보고서와, 데이터 접근만 다룬 1차 보고서.</p>
   <div class="cards cards--single">
     <div class="card">
-      <span class="num">04 · 보고서</span>
+      <span class="num">05 · 보고서</span>
       <h3>받을 필요가 없다 — 4천만 행짜리 표 하나면 된다</h3>
       <p>MIMIC-IV-ECHO 구조, DICOM 없이 쓰는 세 가지 경로, 주제 후보 5개, 12주 계획.</p>
       <div class="tags"><span class="tag">12p</span><span class="tag">스크롤</span><span class="tag">데이터</span></div>
@@ -217,7 +238,7 @@
       <span class="alt">PDF · <a href="pdf/mimic-open-data.pdf">mimic-open-data.pdf</a></span>
     </div>
     <div class="card">
-      <span class="num">05 · 보고서</span>
+      <span class="num">06 · 보고서</span>
       <h3>심초음파 영상 AI로 논문 쓰기 — 2026년의 빈 자리와 6개월 계획</h3>
       <p>서술형 종합 보고서. AI 지형, 도플러의 공백, 데이터 함정, 도플러 E/e′ 설계, KSEcho 일정과 한계까지 한 편으로.</p>
       <div class="tags"><span class="tag">줄글</span><span class="tag">9p</span><span class="tag">종합</span></div>
